@@ -1,10 +1,12 @@
 const cuid = require("cuid");
 const bcrypt = require("bcrypt");
 const { isEmail, isAlphanumeric } = require("validator");
-
 const db = require("../helpers/db");
+const ROLES = require("../helpers/roles");
 
-const SALT_ROUNDS = 10;
+require('dotenv').config();
+
+const SALT_ROUNDS = process.env.SALT_ROUNDS || 10;
 
 const User = db.model("User", {
   _id: { type: String, default: cuid },
@@ -90,7 +92,7 @@ async function remove(_id) {
 async function create(fields) {
   const user = await new User({
     ...fields,
-    roles: ['user']
+    roles: [ROLES.USER]
   });
   await hashPassword(user);
   await user.save();

@@ -4,10 +4,11 @@ const Strategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 
 const { autoCatch } = require('../helpers/auto-catch')
-const Users = require('../models/user')
+const Users = require('../models/user');
+const ROLES = require('../helpers/roles');
 
-const jwtSecret = process.env.JWT_SECRET || 'mark it zero'
-const adminPassword = process.env.ADMIN_PASSWORD || 'iamthewalrus'
+const jwtSecret = process.env.JWT_SECRET || 'secret'
+const adminPassword = process.env.ADMIN_PASSWORD || '12345678'
 const jwtOpts = { algorithm: 'HS256', expiresIn: '30d' }
 
 passport.use(adminStrategy());
@@ -53,7 +54,7 @@ async function ensureUser(req, res, next) {
 
   if(payload) {
     req.payload = payload;
-    if(payload.roles.includes('admin')) req.isAdmin = true;
+    if(payload.roles.includes(ROLES.ADMIN)) req.isAdmin = true;
     return next();
   }
 

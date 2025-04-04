@@ -9,7 +9,9 @@ const product = require('./controllers/product')
 const blog = require('./controllers/blog')
 const campaign = require('./controllers/campaign')
 const message = require('./controllers/message')
+
 require('./helpers/seedAdmin');
+require('dotenv').config();
 
 const port = process.env.PORT || 1337
 

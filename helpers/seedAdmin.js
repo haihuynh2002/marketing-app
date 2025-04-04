@@ -2,7 +2,7 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 
 
-require('dotenv');
+require('dotenv').config();
 
 const mongoURI = process.env.MONGO_URI || 
 'mongodb://root:2002@localhost:27017/marketing-app?authSource=admin';
@@ -16,8 +16,7 @@ async function seedAdmin() {
   
   if (!adminExists) {
     await User.create({
-        username: 'admin',
-        email: 'admin@example.com',
+        username: username,
         password,
         roles: ['admin'],
         isVerified: true
