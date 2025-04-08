@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
+const ROLES = require('./roles');
 
 
 require('dotenv').config();
@@ -18,7 +19,7 @@ async function seedAdmin() {
     await User.create({
         username: username,
         password,
-        roles: ['admin'],
+        roles: [ROLES.ADMIN],
         isVerified: true
     });
 

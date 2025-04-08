@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+
 const { autoCatch } = require('../helpers/auto-catch');
 
 module.exports = autoCatch({
@@ -28,7 +29,7 @@ async function getProduct(req, res, next) {
 async function createProduct(req, res, next) {
     if(!req.isAdmin) return forbidden(next);
 
-    const product = await Product.create(req.body);
+    const product = await Product.create(req.body, req.files);
     res.json(product);
 }
 

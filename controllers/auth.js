@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 
 const { autoCatch } = require('../helpers/auto-catch')
 const Users = require('../models/user');
+const InvalidToken = require('../models/invalidToken');
 const ROLES = require('../helpers/roles');
 
 const jwtSecret = process.env.JWT_SECRET || 'secret'
@@ -50,12 +51,15 @@ async function sign(payload) {
 
 async function ensureUser(req, res, next) {
   const jwtString = req.headers.auhorization || req.cookies.jwt
-  const payload = await verify(jwtString);
 
-  if(payload) {
-    req.payload = payload;
-    if(payload.roles.includes(ROLES.ADMIN)) req.isAdmin = true;
-    return next();
+  if(!await InvalidToken.getByToken(jwtString)) {
+    const payload = await verify(jwtString);
+
+    if(payload) {
+      req.payload = payload;
+      if(payload.roles.includes(ROLES.ADMIN)) req.isAdmin = true;
+      return next();
+    }
   }
 
   const err = new Error("Unauthorized");
@@ -75,8 +79,24 @@ async function verify(jwtString = '') {
     }
 }
 
+async function logout(req, res, next) {
+  const jwtString = req.headers.auhorization || req.cookies.jwt
+  const payload = await verify(jwtString);
+
+  if(payload) {
+    const fields = {
+      token: jwtString,
+      exp: payload.exp,
+    }
+    await InvalidToken.create(fields);
+
+    res.json({ success: true });
+  }
+}
+
 module.exports = autoCatch({
     authenticate,
     login,
+    logout,
     ensureUser,
-  });
+});
