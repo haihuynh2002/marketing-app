@@ -29,7 +29,12 @@ async function getBlog(req, res, next) {
 async function createBlog(req, res, next) {
     if(!req.isAdmin) return forbidden(next);
 
-    const blog = await Blog.create(req.body);
+    const fields = {
+        ...req.body,
+        author: req.payload.sub
+    }
+
+    const blog = await Blog.create(fields);
     res.json(blog);
 }
 

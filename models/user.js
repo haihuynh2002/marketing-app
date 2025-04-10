@@ -11,7 +11,7 @@ const SALT_ROUNDS = process.env.SALT_ROUNDS || 10;
 const User = db.model("User", {
   _id: { type: String, default: cuid },
   username: usernameSchema(),
-  password: { type: String, maxLength: 120, required: true },
+  password: { type: String, maxLength: 120},
   email: emailSchema({ required: true }),
   roles: { type: [String] }
 });
@@ -25,10 +25,10 @@ function usernameSchema() {
     minLength: 3,
     maxLength: 16,
     validate: [
-      {
-        validator: isAlphanumeric,
-        message: (props) => `${props.value} contains special characters`,
-      },
+      // {
+      //   validator: isAlphanumeric,
+      //   message: (props) => `${props.value} contains special characters`,
+      // },
       // {
       //   validator: (str) => !str.match(/^admin$/i),
       //   message: (props) => "Invalid username",
@@ -65,6 +65,11 @@ async function getByUsername(username) {
   return user;
 }
 
+async function getByEmail(email) {
+  const user = await User.findOne({ email });
+  return user;
+}
+
 async function get(_id) {
   const user = await User.findOne({ _id });
   return user;
@@ -74,8 +79,6 @@ async function getByRole(role = "") {
   const user = await User.findOne({ roles: role });
   return user;
 }
-
-
 
 async function list(opts = {}) {
   const { offset = 0, limit = 25 } = opts;
@@ -92,9 +95,9 @@ async function remove(_id) {
 async function create(fields) {
   const user = await new User({
     ...fields,
-    roles: [ROLES.USER]
+    roles: fields.roles || [ROLES.USER]
   });
-  await hashPassword(user);
+  user.password && await hashPassword(user);
   await user.save();
   return user;
 }
@@ -124,7 +127,8 @@ module.exports = {
   get,
   getByUsername,
   getByRole,
+  getByEmail,
   edit,
   remove,
-  create,
+  create
 };

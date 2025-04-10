@@ -28,6 +28,10 @@ app.use(cookieParser())
 app.post('/login', auth.authenticate, auth.login)
 app.post('/logout', auth.authenticate, auth.logout)
 
+app.get('/auth/google/url', auth.getGoogleAuthUrl);
+app.get('/auth/google', auth.authenticateGoogle);
+app.get('/auth/google/callback', auth.authenticateGoogle, auth.loginGoogle);
+
 app.get('/blogs', blog.listBlogs)
 app.get('/blogs/:id', blog.getBlog)
 app.post('/blogs', auth.ensureUser, blog.createBlog)
@@ -59,7 +63,8 @@ app.get('/users', auth.ensureUser, user.listUsers);
 app.put('/users/:id', auth.ensureUser, user.editUser)
 app.delete('/users/:id', auth.ensureUser, user.deleteUser)
 
-//app.get('/health', api.checkHealth)
+
+
 app.use(express.static(path.join(__dirname + '/public')));
 
 app.use(middleware.handleError)
